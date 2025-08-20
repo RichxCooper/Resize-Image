@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer Pro - Resize & Remove Background</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+        }
+        .card {
+            @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6;
+        }
+        .input-field {
+            @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="container mx-auto px-4 py-6">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                    🖼️ Image Resizer Pro
+                </h1>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Professional image resizing with AI-powered background removal and advanced save options
+                </p>
+            </div>
+            
+            <div class="mt-6 flex justify-center space-x-4 text-sm text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span>Resize Images</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                    <span>Remove Backgrounds</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 bg-purple-500 rounded-full"></span>
+                    <span>Multiple Formats</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Progress Steps -->
+        <div class="mb-8">
+            <div class="flex justify-center space-x-2">
+                <div class="flex items-center">
+                    <div id="step-upload" class="flex items-center justify-center w-10 h-10 rounded-full text-lg font-medium transition-all duration-300 bg-blue-600 text-white scale-110">
+                        📁
+                    </div>
+                    <div class="w-16 h-1 mx-2 bg-gray-200"></div>
+                </div>
+                <div class="flex items-center">
+                    <div id="step-edit" class="flex items-center justify-center w-10 h-10 rounded-full text-lg font-medium transition-all duration-300 bg-gray-200 text-gray-500">
+                        ✏️
+                    </div>
+                    <div class="w-16 h-1 mx-2 bg-gray-200"></div>
+                </div>
+                <div class="flex items-center">
+                    <div id="step-background" class="flex items-center justify-center w-10 h-10 rounded-full text-lg font-medium transition-all duration-300 bg-gray-200 text-gray-500">
+                        🎨
+                    </div>
+                    <div class="w-16 h-1 mx-2 bg-gray-200"></div>
+                </div>
+                <div class="flex items-center">
+                    <div id="step-save" class="flex items-center justify-center w-10 h-10 rounded-full text-lg font-medium transition-all duration-300 bg-gray-200 text-gray-500">
+                        💾
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-4 space-x-8">
+                <span id="label-upload" class="text-sm font-medium text-blue-600">Upload Image</span>
+                <span id="label-edit" class="text-sm font-medium text-gray-500">Resize & Edit</span>
+                <span id="label-background" class="text-sm font-medium text-gray-500">Remove Background</span>
+                <span id="label-save" class="text-sm font-medium text-gray-500">Save Image</span>
+            </div>
+        </div>
+
+        <!-- Step Content -->
+        <div id="step-content" class="animate-fade-in">
+            <!-- Upload Step -->
+            <div id="upload-step" class="max-w-2xl mx-auto">
+                <div class="card text-center">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                            Upload Your Image
+                        </h2>
+                        <p class="text-gray-600">
+                            Drag and drop your image here, or click to browse
+                        </p>
+                    </div>
+
+                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-12 transition-all duration-300 cursor-pointer hover:border-blue-400 hover:bg-gray-50">
+                        <input type="file" id="file-input" accept="image/*" class="hidden">
+                        
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">📸</div>
+                            <p class="text-gray-600 mb-2">
+                                <span class="font-medium text-blue-600">Click to upload</span> or drag and drop
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                PNG, JPG, GIF, BMP, WEBP up to 10MB
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="upload-error" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg hidden">
+                        <p class="text-red-600 text-sm"></p>
+                    </div>
+
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
+                                <span class="text-blue-600 text-xl">📏</span>
+                            </div>
+                            <span>Resize to any dimensions</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-2">
+                                <span class="text-green-600 text-xl">🎨</span>
+                            </div>
+                            <span>Remove backgrounds</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-2">
+                                <span class="text-purple-600 text-xl">💾</span>
+                            </div>
+                            <span>Save in multiple formats</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Step -->
+            <div id="edit-step" class="max-w-6xl mx-auto hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="card">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                            Resize & Edit Image
+                        </h2>
+
+                        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium text-gray-900 mb-2">Original Image</h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-600">Width:</span>
+                                    <span id="original-width" class="ml-2 font-medium">0px</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">Height:</span>
+                                    <span id="original-height" class="ml-2 font-medium">0px</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-900 mb-3">New Dimensions</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Width (px)
+                                    </label>
+                                    <input type="number" id="new-width" class="input-field" min="1" max="4000">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Height (px)
+                                    </label>
+                                    <input type="number" id="new-height" class="input-field" min="1" max="4000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-900 mb-3">Quick Presets</h3>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setPreset(800, 600)" class="p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                                    800 × 600
+                                </button>
+                                <button onclick="setPreset(1920, 1080)" class="p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                                    1920 × 1080
+                                </button>
+                                <button onclick="setPreset(1200, 1200)" class="p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                                    1200 × 1200
+                                </button>
+                                <button onclick="setPreset(1500, 1000)" class="p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                                    1500 × 1000
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button onclick="goToStep('upload')" class="btn-secondary flex-1">
+                                ← Back
+                            </button>
+                            <button onclick="goToStep('background')" class="btn-primary flex-1">
+                                Continue →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Preview</h3>
+                        
+                        <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                            <div class="text-center text-sm text-gray-600 mb-2">
+                                New Size: <span id="preview-size">0 × 0</span> pixels
+                            </div>
+                            <div class="text-center text-xs text-gray-500">
+                                <span id="preview-pixels">0K</span> pixels
+                            </div>
+                        </div>
+
+                        <div id="preview-container" class="border border-gray-200 rounded-lg overflow-hidden">
+                            <img id="preview-image" class="w-full h-auto max-h-96 object-contain" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Background Removal Step -->
+            <div id="background-step" class="max-w-6xl mx-auto hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="card">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                            Remove Background
+                        </h2>
+
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-900 mb-3">Removal Quality</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="quality" value="low" class="mr-3">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">Low (Fast)</div>
+                                        <div class="text-sm text-gray-500">Processing time: ~2s</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="quality" value="medium" class="mr-3">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">Medium</div>
+                                        <div class="text-sm text-gray-500">Processing time: ~4s</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="quality" value="high" class="mr-3" checked>
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">High (Slow)</div>
+                                        <div class="text-sm text-gray-500">Processing time: ~6s</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="processing-status" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg hidden">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-blue-700 font-medium">Processing...</span>
+                                <span id="processing-progress" class="text-blue-600 text-sm">0%</span>
+                            </div>
+                            <div class="w-full bg-blue-200 rounded-full h-2">
+                                <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p class="text-blue-600 text-sm mt-2">
+                                AI is analyzing your image and removing the background
+                            </p>
+                        </div>
+
+                        <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <h4 class="font-medium text-yellow-800 mb-2">💡 Tips for Best Results</h4>
+                            <ul class="text-sm text-yellow-700 space-y-1">
+                                <li>• Use high contrast between subject and background</li>
+                                <li>• Ensure good lighting on your subject</li>
+                                <li>• Avoid complex backgrounds with similar colors</li>
+                                <li>• Higher quality settings take longer but give better results</li>
+                            </ul>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button onclick="goToStep('edit')" class="btn-secondary flex-1">
+                                ← Back
+                            </button>
+                            <button id="process-btn" onclick="processBackgroundRemoval()" class="btn-primary flex-1">
+                                Process Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Preview</h3>
+                            <label class="flex items-center text-sm">
+                                <input type="checkbox" id="show-original" class="mr-2">
+                                Show Original
+                            </label>
+                        </div>
+
+                        <div id="background-preview" class="space-y-4">
+                            <div id="original-preview" class="hidden">
+                                <div class="text-sm text-gray-600 mb-2">Original Image</div>
+                                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                    <img id="original-preview-img" class="w-full h-auto max-h-64 object-contain">
+                                </div>
+                            </div>
+
+                            <div id="processed-preview" class="hidden">
+                                <div class="text-sm text-gray-600 mb-2">Background Removed</div>
+                                <div class="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                                    <img id="processed-preview-img" class="w-full h-auto max-h-64 object-contain">
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500 text-center">
+                                    Transparent background (checkerboard pattern)
+                                </div>
+                            </div>
+
+                            <div id="background-placeholder" class="text-center py-12 text-gray-500">
+                                <div class="text-4xl mb-2">🎨</div>
+                                <p>Click "Process" to remove the background</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Step -->
+            <div id="save-step" class="max-w-6xl mx-auto hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="card">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                            Save Your Image
+                        </h2>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                File Name
+                            </label>
+                            <input type="text" id="save-filename" value="processed-image" class="input-field" placeholder="Enter file name">
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-900 mb-3">File Format</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="format" value="png" class="mr-3 mt-1" checked>
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">PNG</div>
+                                        <div class="text-sm text-gray-500">Lossless, supports transparency</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="format" value="jpg" class="mr-3 mt-1">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">JPEG</div>
+                                        <div class="text-sm text-gray-500">Good compression, smaller file size</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="format" value="webp" class="mr-3 mt-1">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">WebP</div>
+                                        <div class="text-sm text-gray-500">Modern format, excellent compression</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Quality: <span id="quality-value">90</span>%
+                            </label>
+                            <input type="range" id="quality-slider" min="10" max="100" value="90" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>Low</span>
+                                <span>High</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                            <div class="text-sm text-gray-600">
+                                Estimated file size: <span id="file-size-estimate" class="font-medium">Unknown</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                Dimensions: <span id="save-dimensions">0 × 0</span> pixels
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <button onclick="downloadImage()" class="btn-primary w-full">
+                                Download Image
+                            </button>
+                            
+                            <button onclick="downloadAllFormats()" class="btn-secondary w-full">
+                                Download All Formats
+                            </button>
+                        </div>
+
+                        <div class="mt-6">
+                            <button onclick="goToStep('background')" class="btn-secondary w-full">
+                                ← Back
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Final Preview</h3>
+                        
+                        <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                            <div class="text-center text-sm text-gray-600 mb-2">
+                                <span id="format-display">PNG</span> Format
+                            </div>
+                            <div class="text-center text-xs text-gray-500">
+                                Quality: <span id="quality-display">90</span>% | Size: <span id="size-display">Unknown</span>
+                            </div>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                            <img id="final-preview" class="w-full h-auto max-h-96 object-contain">
+                        </div>
+
+                        <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <div class="flex items-center text-green-800">
+                                <span class="text-lg mr-2">✅</span>
+                                <div>
+                                    <div class="font-medium">Ready to Download</div>
+                                    <div class="text-sm text-green-700">
+                                        Your image has been processed and is ready to save
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global state
+        let currentStep = 'upload';
+        let originalImage = null;
+        let editedImage = null;
+        let processedImage = null;
+        let imageDimensions = { width: 0, height: 0 };
+        let targetDimensions = { width: 800, height: 600 };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updateStepDisplay();
+        });
+
+        function setupEventListeners() {
+            // File upload
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Quality slider
+            const qualitySlider = document.getElementById('quality-slider');
+            const qualityValue = document.getElementById('quality-value');
+            qualitySlider.addEventListener('input', (e) => {
+                qualityValue.textContent = e.target.value;
+                updateSavePreview();
+            });
+
+            // Format selection
+            document.querySelectorAll('input[name="format"]').forEach(radio => {
+                radio.addEventListener('change', updateSavePreview);
+            });
+
+            // Show original checkbox
+            document.getElementById('show-original').addEventListener('change', (e) => {
+                document.getElementById('original-preview').style.display = e.target.checked ? 'block' : 'none';
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('border-blue-500', 'bg-blue-50');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function processFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please select a valid image file');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showError('File size must be less than 10MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    imageDimensions = {
+                        width: img.naturalWidth || img.width,
+                        height: img.naturalHeight || img.height
+                    };
+                    targetDimensions = { ...imageDimensions };
+                    
+                    // Update edit step inputs
+                    document.getElementById('new-width').value = targetDimensions.width;
+                    document.getElementById('new-height').value = targetDimensions.height;
+                    document.getElementById('original-width').textContent = imageDimensions.width + 'px';
+                    document.getElementById('original-height').textContent = imageDimensions.height + 'px';
+                    
+                    // Generate preview
+                    generatePreview();
+                    
+                    // Go to next step
+                    goToStep('edit');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('upload-error');
+            errorDiv.querySelector('p').textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function goToStep(step) {
+            currentStep = step;
+            updateStepDisplay();
+            updateStepContent();
+        }
+
+        function updateStepDisplay() {
+            const steps = ['upload', 'edit', 'background', 'save'];
+            const labels = ['label-upload', 'label-edit', 'label-background', 'label-save'];
+            
+            steps.forEach((step, index) => {
+                const stepElement = document.getElementById(`step-${step}`);
+                const labelElement = document.getElementById(labels[index]);
+                
+                if (step === currentStep) {
+                    stepElement.classList.add('bg-blue-600', 'text-white', 'scale-110');
+                    stepElement.classList.remove('bg-gray-200', 'text-gray-500');
+                    labelElement.classList.add('text-blue-600');
+                    labelElement.classList.remove('text-gray-500');
+                } else if (steps.indexOf(currentStep) > index) {
+                    stepElement.classList.add('bg-green-500', 'text-white');
+                    stepElement.classList.remove('bg-gray-200', 'text-gray-500');
+                    labelElement.classList.add('text-green-600');
+                    labelElement.classList.remove('text-gray-500');
+                } else {
+                    stepElement.classList.add('bg-gray-200', 'text-gray-500');
+                    stepElement.classList.remove('bg-blue-600', 'text-white', 'scale-110', 'bg-green-500');
+                    labelElement.classList.add('text-gray-500');
+                    labelElement.classList.remove('text-blue-600', 'text-green-600');
+                }
+            });
+
+            // Update progress bars
+            steps.forEach((step, index) => {
+                if (index < steps.length - 1) {
+                    const progressBar = stepElement.nextElementSibling;
+                    if (steps.indexOf(currentStep) > index) {
+                        progressBar.classList.add('bg-green-500');
+                        progressBar.classList.remove('bg-gray-200');
+                    } else {
+                        progressBar.classList.add('bg-gray-200');
+                        progressBar.classList.remove('bg-green-500');
+                    }
+                }
+            });
+        }
+
+        function updateStepContent() {
+            const steps = ['upload', 'edit', 'background', 'save'];
+            steps.forEach(step => {
+                const stepElement = document.getElementById(`${step}-step`);
+                if (step === currentStep) {
+                    stepElement.classList.remove('hidden');
+                } else {
+                    stepElement.classList.add('hidden');
+                }
+            });
+        }
+
+        function setPreset(width, height) {
+            targetDimensions = { width, height };
+            document.getElementById('new-width').value = width;
+            document.getElementById('new-height').value = height;
+            generatePreview();
+        }
+
+        function generatePreview() {
+            if (!originalImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = targetDimensions.width;
+            canvas.height = targetDimensions.height;
+            
+            ctx.drawImage(originalImage, 0, 0, targetDimensions.width, targetDimensions.height);
+            
+            const previewUrl = canvas.toDataURL('image/jpeg', 0.9);
+            const previewImg = document.getElementById('preview-image');
+            previewImg.src = previewUrl;
+            previewImg.style.display = 'block';
+            
+            // Update preview info
+            document.getElementById('preview-size').textContent = `${targetDimensions.width} × ${targetDimensions.height}`;
+            document.getElementById('preview-pixels').textContent = `${Math.round((targetDimensions.width * targetDimensions.height) / 1000)}K`;
+            
+            editedImage = previewUrl;
+        }
+
+        // Update preview when dimensions change
+        document.getElementById('new-width').addEventListener('input', function() {
+            targetDimensions.width = parseInt(this.value) || 0;
+            generatePreview();
+        });
+
+        document.getElementById('new-height').addEventListener('input', function() {
+            targetDimensions.height = parseInt(this.value) || 0;
+            generatePreview();
+        });
+
+        function processBackgroundRemoval() {
+            if (!editedImage) return;
+
+            const quality = document.querySelector('input[name="quality"]:checked').value;
+            const processingTime = quality === 'low' ? 2000 : quality === 'medium' ? 4000 : 6000;
+            
+            // Show processing status
+            document.getElementById('processing-status').classList.remove('hidden');
+            document.getElementById('process-btn').disabled = true;
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                document.getElementById('processing-progress').textContent = progress + '%';
+                document.getElementById('progress-bar').style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    completeBackgroundRemoval();
+                }
+            }, processingTime / 10);
+        }
+
+        function completeBackgroundRemoval() {
+            // Hide processing status
+            document.getElementById('processing-status').classList.add('hidden');
+            document.getElementById('process-btn').disabled = false;
+            
+            // Simulate background removal (in a real app, this would use AI)
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            img.onload = () => {
+                canvas.width = targetDimensions.width;
+                canvas.height = targetDimensions.height;
+                
+                ctx.drawImage(img, 0, 0);
+                
+                // Simple background removal simulation
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    // Simple threshold-based background detection
+                    const brightness = (r + g + b) / 3;
+                    const isBackground = brightness > 240 || (r > 250 && g > 250 && b > 250);
+                    
+                    if (isBackground) {
+                        data[i + 3] = 0; // Make transparent
+                    }
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                
+                const processedUrl = canvas.toDataURL('image/png');
+                processedImage = processedUrl;
+                
+                // Update previews
+                document.getElementById('original-preview-img').src = editedImage;
+                document.getElementById('processed-preview-img').src = processedUrl;
+                document.getElementById('background-placeholder').classList.add('hidden');
+                document.getElementById('processed-preview').classList.remove('hidden');
+                
+                // Update final preview
+                document.getElementById('final-preview').src = processedUrl;
+                
+                // Update save step info
+                updateSavePreview();
+            };
+            
+            img.src = editedImage;
+        }
+
+        function updateSavePreview() {
+            if (!processedImage && !editedImage) return;
+            
+            const format = document.querySelector('input[name="format"]:checked').value;
+            const quality = document.getElementById('quality-slider').value;
+            
+            document.getElementById('format-display').textContent = format.toUpperCase();
+            document.getElementById('quality-display').textContent = quality;
+            document.getElementById('save-dimensions').textContent = `${targetDimensions.width} × ${targetDimensions.height}`;
+            
+            // Estimate file size
+            const pixels = targetDimensions.width * targetDimensions.height;
+            let bytesPerPixel = 4; // RGBA
+            
+            if (format === 'jpg') bytesPerPixel = 3;
+            if (format === 'gif') bytesPerPixel = 1;
+            
+            const estimatedBytes = (pixels * bytesPerPixel * quality) / 100;
+            const mb = estimatedBytes / (1024 * 1024);
+            const fileSize = mb < 1 ? `${Math.round(estimatedBytes / 1024)}KB` : `${mb.toFixed(1)}MB`;
+            
+            document.getElementById('file-size-estimate').textContent = fileSize;
+            document.getElementById('size-display').textContent = fileSize;
+        }
+
+        function downloadImage() {
+            const imageToSave = processedImage || editedImage || originalImage;
+            if (!imageToSave) return;
+            
+            const format = document.querySelector('input[name="format"]:checked').value;
+            const quality = document.getElementById('quality-slider').value / 100;
+            const filename = document.getElementById('save-filename').value;
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            img.onload = () => {
+                canvas.width = targetDimensions.width;
+                canvas.height = targetDimensions.height;
+                ctx.drawImage(img, 0, 0, targetDimensions.width, targetDimensions.height);
+                
+                let mimeType, dataUrl;
+                switch (format) {
+                    case 'png':
+                        mimeType = 'image/png';
+                        dataUrl = canvas.toDataURL(mimeType);
+                        break;
+                    case 'jpg':
+                        mimeType = 'image/jpeg';
+                        dataUrl = canvas.toDataURL(mimeType, quality);
+                        break;
+                    case 'webp':
+                        mimeType = 'image/webp';
+                        dataUrl = canvas.toDataURL(mimeType, quality);
+                        break;
+                    default:
+                        mimeType = 'image/png';
+                        dataUrl = canvas.toDataURL(mimeType);
+                }
+                
+                const link = document.createElement('a');
+                link.download = `${filename}.${format}`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+            
+            img.src = imageToSave;
+        }
+
+        function downloadAllFormats() {
+            const formats = ['png', 'jpg', 'webp'];
+            formats.forEach((format, index) => {
+                setTimeout(() => {
+                    // Temporarily change the selected format
+                    const radio = document.querySelector(`input[name="format"][value="${format}"]`);
+                    radio.checked = true;
+                    downloadImage();
+                }, index * 500);
+            });
+        }
+    </script>
+</body>
+</html>
