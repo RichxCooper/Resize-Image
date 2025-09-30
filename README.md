@@ -22,10 +22,25 @@ A powerful Python application that allows you to resize images and remove backgr
 1. **Install dependencies**: Double-click `install_dependencies.bat`
 2. **Run the app**: Double-click `run_app.bat`
 
+
 ### Option 2: Manual Installation
-1. **Install Python dependencies**:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/RichxCooper/Resize-Image.git
+   cd Resize-Image
+   ```
+2. **(Optional) Create and activate a virtual environment:**
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate
+   ```
+3. **Install Python dependencies:**
    ```bash
    pip install -r requirements.txt
+   ```
+4. **Run the app:**
+   ```bash
+   python image_resizer.py
    ```
 
 2. **Run the application**:
